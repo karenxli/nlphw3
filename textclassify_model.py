@@ -2,13 +2,14 @@
 
 # feel free to include more imports as needed here
 # these are the ones that we used for the base model
+from tokenize import Double
 import numpy as np
 import sys
 from collections import Counter
 import math
 
 """
-Your name and file comment here:
+Your name and file comment here: Karen Li
 """
 
 
@@ -50,7 +51,18 @@ def precision(gold_labels, predicted_labels):
       predicted_labels (list): a corresponding list of labels predicted by the system
   Returns: double precision (a number from 0 to 1)
   """
-  pass
+  # precision = TP/(TP + FP)
+
+  true_pos = []
+  for i in range(len(predicted_labels)):
+    if(predicted_labels[i] == gold_labels[i] and int(predicted_labels[i]) == 1):
+      true_pos.append(1)
+  true_pos_count = len(true_pos)
+  all_pos = [j for j in predicted_labels if int(j) == 1]
+  all_pos_count = len(all_pos)
+  if (all_pos_count == 0): return 0
+  else : return float(true_pos_count/all_pos_count)
+
 
 
 def recall(gold_labels, predicted_labels):
@@ -61,7 +73,16 @@ def recall(gold_labels, predicted_labels):
       predicted_labels (list): a corresponding list of labels predicted by the system
   Returns: double recall (a number from 0 to 1)
   """
-  pass
+  # recall = TP/(TP + FN)
+  intersection = []
+  for i in range(len(predicted_labels)):
+    if(predicted_labels[i] == gold_labels[i]):
+      intersection.append(predicted_labels[i])
+  true_pos = len([i for i in intersection if int(i) == 1])
+  false_neg = len([j for j in gold_labels if int(j) == 1])
+  if(false_neg == 0): return 0
+  else : return float(true_pos / (false_neg))
+
 
 def f1(gold_labels, predicted_labels):
   """
@@ -71,7 +92,12 @@ def f1(gold_labels, predicted_labels):
       predicted_labels (list): a corresponding list of labels predicted by the system
   Returns: double f1 (a number from 0 to 1)
   """
-  pass
+  # f1 = 2PR / P + R
+  p = precision(gold_labels, predicted_labels)
+  r = recall(gold_labels, predicted_labels)
+  if(p == r == 0):
+    return 0
+  else: return float(2*p*r/(p + r))
 
 
 """

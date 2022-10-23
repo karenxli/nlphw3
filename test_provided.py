@@ -76,7 +76,7 @@ class TestTextClassifyBaselineMiniTrain(unittest.TestCase):
         self.assertAlmostEqual(r, tc_model.recall(gold, classified), places = 4)
         self.assertAlmostEqual((2 * p * r) / (p + r), tc_model.f1(gold, classified), places = 4)
 
-
+    '''
     def test_ScorePositiveExample(self):
         #Tests the Probability Distribution of each class for a positive example
         sa = tc_model.TextClassify()
@@ -159,7 +159,7 @@ class TestTextClassifyBaselineMiniTrain(unittest.TestCase):
         actualLabel='0'
         self.assertEqual(actualLabel,label)    
         
-
+'''
 if __name__ == "__main__":
     print("Usage: python test_minitraining.py")
     unittest.main()
