@@ -6,7 +6,6 @@ from tokenize import Double
 from typing import Dict
 import numpy as np
 import sys
-import collections
 import math
 from operator import itemgetter
 
@@ -189,14 +188,14 @@ class TextClassify:
     """
     dataList = data.split()
     scores = dict()
-    posScore = 1
-    negScore = 1
+    posScore = 0
+    negScore = 0
     for word in dataList:
       if(word in self.vocabulary):
-        posScore *= self.posWords.get(word)
-        negScore *= self.negWords.get(word)
-    scores['1'] = posScore * self.positive
-    scores['0'] = negScore * self.negative
+        posScore += np.log(self.posWords.get(word))
+        negScore += np.log(self.negWords.get(word))
+    scores['1'] = np.exp(posScore + np.log(self.positive))
+    scores['0'] = np.exp(negScore + np.log(self.negative))
 
     return scores
 
