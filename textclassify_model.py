@@ -149,7 +149,7 @@ class TextClassify:
         classCount += 1
     for j in self.unigram_labels:
       if int(self.unigram_labels.get(j)) == classSign:
-        overallCount += len(j)
+        overallCount += len(j.split())
     return float((classCount + 1)/(overallCount + len(self.vocabulary)))
   
   def countClass(self):
@@ -179,8 +179,6 @@ class TextClassify:
     self.vocabulary = set(self.corpus)
     self.overallProbability()
     self.countClass()
-    print(self.posWords)
-    print(self.negWords)
 
   def score(self, data):
     """
@@ -189,7 +187,18 @@ class TextClassify:
       data - str like "I loved the hotel"
     Return: dict of class: score mappings
     """
-    pass
+    dataList = data.split()
+    scores = dict()
+    posScore = 1
+    negScore = 1
+    for word in dataList:
+      if(word in self.vocabulary):
+        posScore *= self.posWords.get(word)
+        negScore *= self.negWords.get(word)
+    scores['1'] = posScore * self.positive
+    scores['0'] = negScore * self.negative
+
+    return scores
 
   def classify(self, data):
     """
@@ -198,7 +207,10 @@ class TextClassify:
       data - str like "I loved the hotel"
     Return: string class label
     """
-    pass
+    scoringResults = self.score(data)
+    if(scoringResults.get('0') > scoringResults.get('1')): # what to do if equal?
+      return '0' 
+    else: return '1'
 
   def featurize(self, data):
     """

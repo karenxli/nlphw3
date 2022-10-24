@@ -85,14 +85,14 @@ class TestTextClassifyBaselineMiniTrain(unittest.TestCase):
         #Trains the Naive Bayes Classifier based on the tuples from the training data
         sa.train(examples)
         #Returns a probability distribution of each class for the given test sentence
-        #score=sa.score("I loved the hotel")
+        score = sa.score("I loved the hotel")
         #P(C|text)=P(I|C)*P(loved|C)*P(the|C)*P(hotel|C),where C is either 0 or 1(Classifier)
-        #pos = ((1+1)/(8+12))*((1+1)/(8+12))*((1+1)/(8+12))*((2+1)/(8+12))*(2/4)
-        #neg = ((1+1)/(11+12))*((0+1)/(11+12))*((1+1)/(11+12))*((2+1)/(11+12))*(2/4)
-        #actualScoreDistribution={'1': pos, '0': neg}
-        #self.assertAlmostEqual(actualScoreDistribution['0'], score['0'], places=5)
-        #self.assertAlmostEqual(actualScoreDistribution['1'], score['1'], places=5)
-    '''
+        pos = ((1+1)/(8+12))*((1+1)/(8+12))*((1+1)/(8+12))*((2+1)/(8+12))*(2/4)
+        neg = ((1+1)/(11+12))*((0+1)/(11+12))*((1+1)/(11+12))*((2+1)/(11+12))*(2/4)
+        actualScoreDistribution={'1': pos, '0': neg}
+        self.assertAlmostEqual(actualScoreDistribution['0'], score['0'], places=5)
+        self.assertAlmostEqual(actualScoreDistribution['1'], score['1'], places=5)
+
     def test_ScorePositiveExampleRepeats(self):
         #Tests the Probability Distribution of each class for a positive example
         sa = tc_model.TextClassify()
@@ -108,7 +108,6 @@ class TestTextClassifyBaselineMiniTrain(unittest.TestCase):
         self.assertAlmostEqual(actualScoreDistribution['0'], score['0'], places=5)
         self.assertAlmostEqual(actualScoreDistribution['1'], score['1'], places=5)
 
-    
     def test_ScorePositiveExampleWithUnkowns(self):
         #Tests the Probability Distribution of each class for a positive example
         sa = tc_model.TextClassify()
@@ -124,7 +123,6 @@ class TestTextClassifyBaselineMiniTrain(unittest.TestCase):
         self.assertAlmostEqual(actualScoreDistribution['0'], score['0'], places=5)
         self.assertAlmostEqual(actualScoreDistribution['1'], score['1'], places=5)
         
-    
     def test_ClassifyForPositiveExample(self):
         #Tests the label classified  for the positive test sentence
         sa = tc_model.TextClassify()
@@ -160,7 +158,6 @@ class TestTextClassifyBaselineMiniTrain(unittest.TestCase):
         actualLabel='0'
         self.assertEqual(actualLabel,label)    
         
-'''
 if __name__ == "__main__":
     print("Usage: python test_minitraining.py")
     unittest.main()
