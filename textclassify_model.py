@@ -120,6 +120,8 @@ class TextClassify:
     self.vocabulary = []            # vocabulary of the corpus (all unique words)
     self.positive = 0
     self.negative = 0
+    self.posWords = dict()
+    self.negWords = dict()
 
   # creates the bag of words
   def createBag(self):
@@ -142,12 +144,26 @@ class TextClassify:
     classCount = 0
     overallCount = 0
     for i in self.unigram_labels:
-      if word in i and self.unigram_labels.get(i) == classSign:
+      listSentence = i.split()
+      if word in listSentence and int(self.unigram_labels.get(i)) == classSign:
         classCount += 1
     for j in self.unigram_labels:
-      if self.unigram_labels.get(j) == classSign:
+      if int(self.unigram_labels.get(j)) == classSign:
         overallCount += len(j)
-    return float(classCount/overallCount)
+    return float((classCount + 1)/(overallCount + len(self.vocabulary)))
+  
+  def countClass(self):
+    zero = dict()
+    one = dict()
+
+    for word in self.vocabulary:
+      zero_prob = self.countProbability(word, 0)
+      one_prob = self.countProbability(word, 1)
+      zero[word] = zero_prob
+      one[word] = one_prob
+    self.posWords = one
+    self.negWords = zero
+
   def train(self, examples):
     """
     Trains the classifier based on the given examples
@@ -162,7 +178,9 @@ class TextClassify:
 
     self.vocabulary = set(self.corpus)
     self.overallProbability()
-    pass
+    self.countClass()
+    print(self.posWords)
+    print(self.negWords)
 
   def score(self, data):
     """
