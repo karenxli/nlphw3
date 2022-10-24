@@ -3,10 +3,12 @@
 # feel free to include more imports as needed here
 # these are the ones that we used for the base model
 from tokenize import Double
+from typing import Dict
 import numpy as np
 import sys
-from collections import Counter
+import collections
 import math
+from operator import itemgetter
 
 """
 Your name and file comment here: Karen Li
@@ -63,8 +65,6 @@ def precision(gold_labels, predicted_labels):
   if (all_pos_count == 0): return 0
   else : return float(true_pos_count/all_pos_count)
 
-
-
 def recall(gold_labels, predicted_labels):
   """
   Calculates the recall for a set of predicted labels give the gold (ground truth) labels.
@@ -82,7 +82,6 @@ def recall(gold_labels, predicted_labels):
   false_neg = len([j for j in gold_labels if int(j) == 1])
   if(false_neg == 0): return 0
   else : return float(true_pos / (false_neg))
-
 
 def f1(gold_labels, predicted_labels):
   """
@@ -114,8 +113,37 @@ class TextClassify:
 
   def __init__(self):
     # do whatever you need to do to set up your class here
-    pass
+    self.unigram_labels = dict()    # every sentence with its class
+    self.corpus = []                # the unigrams themselves
+    self.text = []                  # examples
+    self.givenLabels = []
+    self.vocabulary = []            # vocabulary of the corpus (all unique words)
+    self.positive = 0
+    self.negative = 0
 
+  # creates the bag of words
+  def createBag(self):
+    sentences= list(map(itemgetter(1), self.text))
+    for line in sentences:
+      self.corpus += line.split()
+    self.givenLabels = list(map(itemgetter(2), self.text)) # collects all labels
+  
+  # sets P(-) and P(+)
+  def overallProbability(self):
+    positive_docs = len([k for k,v in self.unigram_labels.items() if float(v) == 1]) # number of docs with class 1
+    negative_docs = len([k for k,v in self.unigram_labels.items() if float(v) == 0]) # number of docs with class 0
+    all_docs = len(self.unigram_labels)
+    
+    self.positive = positive_docs/all_docs
+    self.negative = negative_docs/all_docs
+
+  # given a word, finds the probability of that word appearing depending on class
+  def countProbability(self, word, classSign):
+
+    for i in self.unigram_labels:
+      if (word is in i) and i.get()
+    pass
+  
   def train(self, examples):
     """
     Trains the classifier based on the given examples
@@ -123,6 +151,13 @@ class TextClassify:
       examples - a list of tuples of strings formatted [(id, example_text, label), (id, example_text, label)....]
     Return: None
     """
+    self.text = examples
+    self.createBag()
+    for i in range(len(self.text)):
+      self.unigram_labels[self.text[i][1]] = self.text[i][2]
+
+    self.vocabulary = set(self.corpus)
+    self.overallProbability()
     pass
 
   def score(self, data):
