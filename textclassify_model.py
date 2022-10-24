@@ -139,11 +139,15 @@ class TextClassify:
 
   # given a word, finds the probability of that word appearing depending on class
   def countProbability(self, word, classSign):
-
+    classCount = 0
+    overallCount = 0
     for i in self.unigram_labels:
-      if (word is in i) and i.get()
-    pass
-  
+      if word in i and self.unigram_labels.get(i) == classSign:
+        classCount += 1
+    for j in self.unigram_labels:
+      if self.unigram_labels.get(j) == classSign:
+        overallCount += len(j)
+    return float(classCount/overallCount)
   def train(self, examples):
     """
     Trains the classifier based on the given examples
@@ -274,12 +278,3 @@ if __name__ == "__main__":
     sys.exit(1)
 
   main()
- 
-
-
-
-
-
-
-
-
