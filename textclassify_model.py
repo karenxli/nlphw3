@@ -138,9 +138,6 @@ def overallProbability(unigram_labels):
     all_docs = len(unigram_labels)
 
     return (positive_docs/all_docs, negative_docs/all_docs)
-    
-    #self.positive = positive_docs/all_docs
-    #self.negative = negative_docs/all_docs
 
 # given a word, finds the probability of that word appearing depending on class
 def countProbability(unigram_labels, vocabulary, word, classSign):
@@ -154,9 +151,25 @@ def countProbability(unigram_labels, vocabulary, word, classSign):
       if int(unigram_labels.get(j)) == classSign:
         overallCount += len(j.split())
     return float((classCount + 1)/(overallCount + len(vocabulary)))
+
+def countClass(unigram_labels, vocabulary):
+    zero = dict()
+    one = dict()
+
+    for word in vocabulary:
+      zero_prob = countProbability(unigram_labels, vocabulary, word, 0)
+      one_prob = countProbability(unigram_labels, vocabulary, word, 1)
+      zero[word] = zero_prob
+      one[word] = one_prob
+    return (one, zero)
+
+
+
 """
 implement your TextClassify class here
 """
+
+
 class TextClassify:
 
 
@@ -172,18 +185,6 @@ class TextClassify:
     self.posWords = dict()
     self.negWords = dict()
 
-  
-  def countClass(self):
-    zero = dict()
-    one = dict()
-
-    for word in self.vocabulary:
-      zero_prob = countProbability(self.unigram_labels, self.vocabulary, word, 0)
-      one_prob = countProbability(self.unigram_labels, self.vocabulary, word, 1)
-      zero[word] = zero_prob
-      one[word] = one_prob
-    self.posWords = one
-    self.negWords = zero
 
   def train(self, examples):
     """
@@ -205,7 +206,9 @@ class TextClassify:
     self.positive = overallProb[0]
     self.negative = overallProb[1]
 
-    self.countClass()
+    classes = countClass(self.unigram_labels, self.vocabulary)
+    self.posWords = classes[0]
+    self.negWords = classes[1]
 
   def score(self, data):
     """
@@ -315,7 +318,11 @@ class TextClassifyImproved:
       self.unigram_labels[self.text[i][1]] = self.text[i][2]
 
     self.vocabulary = set(self.corpus)
-    self.overallProbability()
+    
+    overallProb = overallProbability(self.unigram_labels)
+    self.positive = overallProb[0]
+    self.negative = overallProb[1]
+
     self.countClass()
 
     # bag of words
