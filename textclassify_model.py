@@ -8,6 +8,7 @@ from collections import Counter
 from venv import create
 import numpy as np
 import sys
+import math
 from operator import itemgetter
 
 """
@@ -17,7 +18,20 @@ Your name and file comment here: Karen Li
 
 """
 Cite your sources here:
+
+;
+;   Minqing Hu and Bing Liu. "Mining and Summarizing Customer Reviews." 
+;       Proceedings of the ACM SIGKDD International Conference on Knowledge 
+;       Discovery and Data Mining (KDD-2004), Aug 22-25, 2004, Seattle, 
+;       Washington, USA, 
+;   Bing Liu, Minqing Hu and Junsheng Cheng. "Opinion Observer: Analyzing 
+;       and Comparing Opinions on the Web." Proceedings of the 14th 
+;       International World Wide Web conference (WWW-2005), May 10-14, 
+;       2005, Chiba, Japan.
+
+
 """
+
 
 """
 Implement your functions that are not methods of the TextClassify class here
@@ -110,6 +124,24 @@ def createBag(text):
   return corpus
   #self.givenLabels = list(map(itemgetter(2), self.text)) # collects all labels
 
+def convertText(file):
+  my_file = open(file, "r")
+  data = my_file.read()
+  data_into_list = data.split("\n")
+  my_file.close()
+  return data_into_list
+
+  # sets P(-) and P(+)
+def overallProbability(unigram_labels):
+    positive_docs = len([k for k,v in unigram_labels.items() if float(v) == 1]) # number of docs with class 1
+    negative_docs = len([k for k,v in unigram_labels.items() if float(v) == 0]) # number of docs with class 0
+    all_docs = len(unigram_labels)
+
+    return (positive_docs/all_docs, negative_docs/all_docs)
+    
+    #self.positive = positive_docs/all_docs
+    #self.negative = negative_docs/all_docs
+
 
 """
 implement your TextClassify class here
@@ -129,15 +161,6 @@ class TextClassify:
     self.posWords = dict()
     self.negWords = dict()
 
-
-  # sets P(-) and P(+)
-  def overallProbability(self):
-    positive_docs = len([k for k,v in self.unigram_labels.items() if float(v) == 1]) # number of docs with class 1
-    negative_docs = len([k for k,v in self.unigram_labels.items() if float(v) == 0]) # number of docs with class 0
-    all_docs = len(self.unigram_labels)
-    
-    self.positive = positive_docs/all_docs
-    self.negative = negative_docs/all_docs
 
   # given a word, finds the probability of that word appearing depending on class
   def countProbability(self, word, classSign):
@@ -179,7 +202,11 @@ class TextClassify:
       self.unigram_labels[self.text[i][1]] = self.text[i][2]
 
     self.vocabulary = set(self.corpus)
-    self.overallProbability()
+    
+    overallProb = overallProbability(self.unigram_labels)
+    self.positive = overallProb[0]
+    self.negative = overallProb[1]
+
     self.countClass()
 
   def score(self, data):
@@ -197,8 +224,12 @@ class TextClassify:
       if(word in self.vocabulary):
         posScore += np.log(self.posWords.get(word))
         negScore += np.log(self.negWords.get(word))
-    scores['1'] = np.exp(posScore + np.log(self.positive))
-    scores['0'] = np.exp(negScore + np.log(self.negative))
+    #if(posScore < -300 or negScore < -300):
+    #      scores['1'] = np.exp(math.sqrt(abs(posScore)) * -1 + np.log(self.positive))
+    #      scores['0'] = np.exp(math.sqrt(abs(negScore)) * -1 + np.log(self.negative))
+    #else : 
+      scores['1'] = np.exp(posScore + np.log(self.positive))
+      scores['0'] = np.exp(negScore + np.log(self.negative))
 
     return scores
 
@@ -212,11 +243,11 @@ class TextClassify:
     scoringResults = self.score(data)
     if(scoringResults.get('0') > scoringResults.get('1')): return '0' # what to do if equal?
     elif (scoringResults.get('0') < scoringResults.get('1')): return '1'
-    else: 
-      dataList = data.split()
-      firstWord = dataList[0]
-      if(self.posWords.get(firstWord) > self.negWords.get(firstWord)): return '1'
-      else: return '0'
+    else: return '0'
+    #  dataList = data.split()
+    #  firstWord = dataList[0]
+    #  if(self.posWords.get(firstWord) > self.negWords.get(firstWord)): return '1'
+    #  else: return '0'
 
 
   def featurize(self, data):
@@ -244,19 +275,31 @@ class TextClassifyImproved:
     self.text = []                  # examples
     self.givenLabels = []
     self.vocabulary = []            # vocabulary of the corpus (all unique words)
+    self.positive = 0
+    self.negative = 0
+
+    self.posLexicon = []
+    self.negLexicon = []
+    self.posWords = dict()
+    self.negWords = dict()
 
   # converts all words to lowercase
   def lowercase(self):
+    new_corp = []
     for word in self.corpus:
-      word = word.lower()
+      new_corp.append(word.lower())
+    return new_corp
+    
 
   # removes the stop words (top 5% popular words)
   def stopWord(self):
     wordCount = set(self.corpus)
-    topWordCount = len(wordCount) / 20 # top 5% of words
+    topWordCount = math.ceil(len(wordCount) / 20) # top 5% of words
     topWord = Counter(self.corpus).most_common(topWordCount)
-    topList = topWord.keys()
-    
+    topList = []
+    for word in topWord:
+      topList.append(word[0])
+    #print(topWord)
     self.corpus = [word for word in self.corpus if word not in topList]
 
 
@@ -269,9 +312,20 @@ class TextClassifyImproved:
     """
     self.text = examples
     self.corpus = createBag(self.text)
-    self.lowercase()
+    print(self.corpus)
+    self.corpus = self.lowercase()
     self.stopWord()
 
+    # create positive and negative lexicons
+    self.posLexicon = convertText("positive_words.txt")
+    self.negLexicon = convertText("negative_words.txt")
+    
+    for i in range(len(self.text)):
+      self.unigram_labels[self.text[i][1]] = self.text[i][2]
+
+    self.vocabulary = set(self.corpus)
+    self.overallProbability()
+    self.countClass()
 
     # bag of words
 
