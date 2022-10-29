@@ -224,12 +224,9 @@ class TextClassify:
       if(word in self.vocabulary):
         posScore += np.log(self.posWords.get(word))
         negScore += np.log(self.negWords.get(word))
-    #if(posScore < -300 or negScore < -300):
-    #      scores['1'] = np.exp(math.sqrt(abs(posScore)) * -1 + np.log(self.positive))
-    #      scores['0'] = np.exp(math.sqrt(abs(negScore)) * -1 + np.log(self.negative))
-    #else : 
-      scores['1'] = np.exp(posScore + np.log(self.positive))
-      scores['0'] = np.exp(negScore + np.log(self.negative))
+
+    scores['1'] = np.exp(posScore + np.log(self.positive))
+    scores['0'] = np.exp(negScore + np.log(self.negative))
 
     return scores
 
@@ -244,10 +241,6 @@ class TextClassify:
     if(scoringResults.get('0') > scoringResults.get('1')): return '0' # what to do if equal?
     elif (scoringResults.get('0') < scoringResults.get('1')): return '1'
     else: return '0'
-    #  dataList = data.split()
-    #  firstWord = dataList[0]
-    #  if(self.posWords.get(firstWord) > self.negWords.get(firstWord)): return '1'
-    #  else: return '0'
 
 
   def featurize(self, data):

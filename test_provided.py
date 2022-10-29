@@ -13,7 +13,7 @@ class TestTextClassifyBaselineMiniTrain(unittest.TestCase):
         self.devFilePath="training_files/minidev.txt"
         self.devPath = "dev_file.txt"
         self.filePath = "training_files/train_file.txt"
-    '''
+
     def test_GenerateTuplesFromTrainingFile(self):
         #Tests the tuple generation from the sentences
         sa = tc_model.TextClassify()
@@ -158,7 +158,7 @@ class TestTextClassifyBaselineMiniTrain(unittest.TestCase):
         label=sa.classify("I hated the hotel")
         actualLabel='0'
         self.assertEqual(actualLabel,label)  
-    
+    '''
     def test_checkingPrecision(self):
         #Tests the label classified  for the positive test sentence
         sa = tc_model.TextClassify()
@@ -183,12 +183,12 @@ class TestTextClassifyBaselineMiniTrain(unittest.TestCase):
         print(predictedlabels)
         print(tc_model.precision(goldlabels, predictedlabels))
         print(tc_model.recall(goldlabels, predictedlabels))
-    '''
+    
     def test_Improved(self):
         im = tc_model.TextClassifyImproved()
         examples = tc_model.generate_tuples_from_file(self.trainingFilePath)
         im.train(examples)
-
+'''
         
         
 if __name__ == "__main__":
