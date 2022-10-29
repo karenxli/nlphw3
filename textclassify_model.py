@@ -142,7 +142,18 @@ def overallProbability(unigram_labels):
     #self.positive = positive_docs/all_docs
     #self.negative = negative_docs/all_docs
 
-
+# given a word, finds the probability of that word appearing depending on class
+def countProbability(unigram_labels, vocabulary, word, classSign):
+    classCount = 0
+    overallCount = 0
+    for i in unigram_labels:
+      listSentence = i.split()
+      if word in listSentence and int(unigram_labels.get(i)) == classSign:
+        classCount += 1
+    for j in unigram_labels:
+      if int(unigram_labels.get(j)) == classSign:
+        overallCount += len(j.split())
+    return float((classCount + 1)/(overallCount + len(vocabulary)))
 """
 implement your TextClassify class here
 """
@@ -161,27 +172,14 @@ class TextClassify:
     self.posWords = dict()
     self.negWords = dict()
 
-
-  # given a word, finds the probability of that word appearing depending on class
-  def countProbability(self, word, classSign):
-    classCount = 0
-    overallCount = 0
-    for i in self.unigram_labels:
-      listSentence = i.split()
-      if word in listSentence and int(self.unigram_labels.get(i)) == classSign:
-        classCount += 1
-    for j in self.unigram_labels:
-      if int(self.unigram_labels.get(j)) == classSign:
-        overallCount += len(j.split())
-    return float((classCount + 1)/(overallCount + len(self.vocabulary)))
   
   def countClass(self):
     zero = dict()
     one = dict()
 
     for word in self.vocabulary:
-      zero_prob = self.countProbability(word, 0)
-      one_prob = self.countProbability(word, 1)
+      zero_prob = countProbability(self.unigram_labels, self.vocabulary, word, 0)
+      one_prob = countProbability(self.unigram_labels, self.vocabulary, word, 1)
       zero[word] = zero_prob
       one[word] = one_prob
     self.posWords = one
