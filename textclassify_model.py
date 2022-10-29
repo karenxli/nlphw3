@@ -4,9 +4,10 @@
 # these are the ones that we used for the base model
 from tokenize import Double
 from typing import Dict
+from collections import Counter
+from venv import create
 import numpy as np
 import sys
-import math
 from operator import itemgetter
 
 """
@@ -101,7 +102,13 @@ def f1(gold_labels, predicted_labels):
 """
 Implement any other non-required functions here
 """
-
+def createBag(text):
+  sentences= list(map(itemgetter(1), text))
+  corpus = []
+  for line in sentences:
+    corpus += line.split()
+  return corpus
+  #self.givenLabels = list(map(itemgetter(2), self.text)) # collects all labels
 
 
 """
@@ -122,13 +129,7 @@ class TextClassify:
     self.posWords = dict()
     self.negWords = dict()
 
-  # creates the bag of words
-  def createBag(self):
-    sentences= list(map(itemgetter(1), self.text))
-    for line in sentences:
-      self.corpus += line.split()
-    self.givenLabels = list(map(itemgetter(2), self.text)) # collects all labels
-  
+
   # sets P(-) and P(+)
   def overallProbability(self):
     positive_docs = len([k for k,v in self.unigram_labels.items() if float(v) == 1]) # number of docs with class 1
@@ -171,7 +172,9 @@ class TextClassify:
     Return: None
     """
     self.text = examples
-    self.createBag()
+    self.corpus = createBag(self.text)
+    self.givenLabels = list(map(itemgetter(2), self.text)) # collects all labels
+
     for i in range(len(self.text)):
       self.unigram_labels[self.text[i][1]] = self.text[i][2]
 
@@ -207,9 +210,14 @@ class TextClassify:
     Return: string class label
     """
     scoringResults = self.score(data)
-    if(scoringResults.get('0') > scoringResults.get('1')): # what to do if equal?
-      return '0' 
-    else: return '1'
+    if(scoringResults.get('0') > scoringResults.get('1')): return '0' # what to do if equal?
+    elif (scoringResults.get('0') < scoringResults.get('1')): return '1'
+    else: 
+      dataList = data.split()
+      firstWord = dataList[0]
+      if(self.posWords.get(firstWord) > self.negWords.get(firstWord)): return '1'
+      else: return '0'
+
 
   def featurize(self, data):
     """
@@ -227,9 +235,30 @@ class TextClassify:
 
 
 class TextClassifyImproved:
-
+  # normalizing text: 
+    # - removing stop words
+    # - converting all words to lowercase
   def __init__(self):
-    pass
+    self.unigram_labels = dict()    # every sentence with its class
+    self.corpus = []                # the unigrams themselves
+    self.text = []                  # examples
+    self.givenLabels = []
+    self.vocabulary = []            # vocabulary of the corpus (all unique words)
+
+  # converts all words to lowercase
+  def lowercase(self):
+    for word in self.corpus:
+      word = word.lower()
+
+  # removes the stop words (top 5% popular words)
+  def stopWord(self):
+    wordCount = set(self.corpus)
+    topWordCount = len(wordCount) / 20 # top 5% of words
+    topWord = Counter(self.corpus).most_common(topWordCount)
+    topList = topWord.keys()
+    
+    self.corpus = [word for word in self.corpus if word not in topList]
+
 
   def train(self, examples):
     """
@@ -238,7 +267,13 @@ class TextClassifyImproved:
       examples - a list of tuples of strings formatted [(id, example_text, label), (id, example_text, label)....]
     Return: None
     """
-    pass
+    self.text = examples
+    self.corpus = createBag(self.text)
+    self.lowercase()
+    self.stopWord()
+
+
+    # bag of words
 
   def score(self, data):
     """
