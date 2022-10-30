@@ -158,37 +158,28 @@ class TestTextClassifyBaselineMiniTrain(unittest.TestCase):
         label=sa.classify("I hated the hotel")
         actualLabel='0'
         self.assertEqual(actualLabel,label)  
-    '''
-    def test_checkingPrecision(self):
-        #Tests the label classified  for the positive test sentence
-        sa = tc_model.TextClassify()
-        examples = tc_model.generate_tuples_from_file(self.filePath)   
-        sa.train(examples)
-        devExamples = tc_model.generate_tuples_from_file(self.devPath) 
-        #print(devExamples)
-        #score=sa.score("I didn't enjoy my experience in this hotel because their were insects in my hotel room and it seemed very dirty.")
-        #score3 = sa.score("I was very impressed with the hotel. The exterior of the hotel was one thing, which is simply marvelous, but it was probably the roomiest hotel in the Concord, NH area. It is close to my brother's school, had excellent service and pretty nifty free toiletry, nice bathrooms, free internet connection and more. The attendants were very attentive, and I would love to stay there again if not for the price.")
-        #score2 = sa.score("Absolutely a great hotel for families! The rooms are spacious, restaraunts are very kid-friendly, and the pool area is gorgeous. My children felt like they were at a water park, not just another hotel. We will definitely return for another stay here!")
-        #print(score)
-        #print(score2)
-        #print(score3)
+
+    def test_Improved(self):
+        im = tc_model.TextClassifyImproved()
+        examples = tc_model.generate_tuples_from_file(self.filePath)
+        im.train(examples)
+        devExamples = tc_model.generate_tuples_from_file(self.devPath)
+        #label=im.classify("I hated the hotel")
+        #actualLabel='0'
+        #self.assertEqual(actualLabel,label) 
 
         goldlabels = []
         predictedlabels = []
         for sentence in devExamples:
-            predictedlabels.append(sa.classify(sentence[1]))
+            predictedlabels.append(im.classify(sentence[1]))
             goldlabels.append(sentence[2])
-            print(sa.score(sentence[1]))
+            print(im.score(sentence[1]))
         print(goldlabels)
         print(predictedlabels)
         print(tc_model.precision(goldlabels, predictedlabels))
         print(tc_model.recall(goldlabels, predictedlabels))
-    
-    def test_Improved(self):
-        im = tc_model.TextClassifyImproved()
-        examples = tc_model.generate_tuples_from_file(self.trainingFilePath)
-        im.train(examples)
-'''
+        print(tc_model.f1(goldlabels, predictedlabels))
+
         
         
 if __name__ == "__main__":

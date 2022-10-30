@@ -116,14 +116,15 @@ def f1(gold_labels, predicted_labels):
 """
 Implement any other non-required functions here
 """
+# creates a bag of words
 def createBag(text):
   sentences= list(map(itemgetter(1), text))
   corpus = []
   for line in sentences:
     corpus += line.split()
   return corpus
-  #self.givenLabels = list(map(itemgetter(2), self.text)) # collects all labels
 
+# converts a file + w/ file path to a list of words
 def convertText(file):
   my_file = open(file, "r")
   data = my_file.read()
@@ -152,6 +153,8 @@ def countProbability(unigram_labels, vocabulary, word, classSign):
         overallCount += len(j.split())
     return float((classCount + 1)/(overallCount + len(vocabulary)))
 
+
+# sorts the vocabulary words into correct unigram labels 
 def countClass(unigram_labels, vocabulary):
     zero = dict()
     one = dict()
@@ -221,6 +224,7 @@ class TextClassify:
     scores = dict()
     posScore = 0
     negScore = 0
+    
     for word in dataList:
       if(word in self.vocabulary):
         posScore += np.log(self.posWords.get(word))
@@ -306,7 +310,6 @@ class TextClassifyImproved:
     """
     self.text = examples
     self.corpus = createBag(self.text)
-    print(self.corpus)
     self.corpus = self.lowercase()
     self.stopWord()
 
@@ -323,7 +326,9 @@ class TextClassifyImproved:
     self.positive = overallProb[0]
     self.negative = overallProb[1]
 
-    self.countClass()
+    classes = countClass(self.unigram_labels, self.vocabulary)
+    self.posWords = classes[0]
+    self.negWords = classes[1]
 
     # bag of words
 
@@ -338,7 +343,28 @@ class TextClassifyImproved:
     return a dictionary of the values of P(data | c)  for each class, 
     as in section 4.3 of the textbook e.g. {"0": 0.000061, "1": 0.000032}
     """
-    pass
+    dataList = data.split()
+    scores = dict()
+    posScore = 0
+    negScore = 0
+    posLex = 1
+    negLex = 1
+
+
+    for word in dataList:
+      if(word in self.vocabulary):
+        posScore += np.log(self.posWords.get(word))
+        negScore += np.log(self.negWords.get(word))
+
+      if(word in self.posLexicon):
+        posLex += 1
+      if(word in self.negLexicon):
+        negLex += 1
+
+    scores['1'] = np.exp(posScore + np.log(self.positive) + np.log(posLex))
+    scores['0'] = np.exp(negScore + np.log(self.negative) + np.log(negLex))
+
+    return scores
 
   def classify(self, data):
     """
@@ -347,7 +373,7 @@ class TextClassifyImproved:
       data - str like "I loved the hotel"
     Return: string class label
     """
-    pass
+    return TextClassify.classify(self, data)
 
   def featurize(self, data):
     """
@@ -361,7 +387,7 @@ class TextClassifyImproved:
     pass
 
   def __str__(self):
-    return "NAME OF YOUR CLASSIFIER HERE"
+    return "Sentiment lexicon + normalization classifier :D"
 
 
 
