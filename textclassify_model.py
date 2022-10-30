@@ -2,8 +2,6 @@
 
 # feel free to include more imports as needed here
 # these are the ones that we used for the base model
-from tokenize import Double
-from typing import Dict
 from collections import Counter
 from venv import create
 import numpy as np
@@ -257,7 +255,7 @@ class TextClassify:
     Return: a list of tuples linking features to values
     for BoW, a list of tuples linking every word to True [("I", True), ("loved", True), ("it", True)]
     """
-    pass
+    return [(i, True) for i in data.split()]
 
   def __str__(self):
     return "Naive Bayes - bag-of-words baseline"
@@ -384,7 +382,7 @@ class TextClassifyImproved:
     Return: a list of tuples linking features to values
     for BoW, a list of tuples linking every word to True [("I", True), ("loved", True), ("it", True)]
     """
-    pass
+    return [(i, True) for i in data.split()]
 
   def __str__(self):
     return "Sentiment lexicon + normalization classifier :D"
@@ -399,17 +397,56 @@ def main():
   classifier = TextClassify()
   print(classifier)
   # do the things that you need to with your base class
-
-
+  examples = generate_tuples_from_file(training)
+        #Trains the Naive Bayes Classifier based on the tuples from the training data
+  classifier.train(examples)
+        #Returns a probability distribution of each class for the given test sentence
+  testingExamples = generate_tuples_from_file(testing)
+  Npredictedlabels = []
+  Ngoldlabels = []
+  for sentence in testingExamples:
+            Npredictedlabels.append(classifier.classify(sentence[1]))
+            Ngoldlabels.append(sentence[2])
+            print(classifier.score(sentence[1]))
+  
+  naive_precision = precision(Ngoldlabels, Npredictedlabels)
+  naive_recall = recall(Ngoldlabels, Npredictedlabels)
+  naive_f1 = f1(Ngoldlabels, Npredictedlabels)
+  
   # report precision, recall, f1
+  print("Naive Precision: " + str(naive_precision))
+  print("Naive Recall: " + str(naive_recall))
+  print("Naive F1: " + str(naive_f1))
+
   
 
   improved = TextClassifyImproved()
   print(improved)
   # do the things that you need to with your improved class
 
+        #Trains the Naive Bayes Classifier based on the tuples from the training data
+  improved.train(examples)
+        #Returns a probability distribution of each class for the given test sentence
+  Ipredictedlabels = []
+  Igoldlabels = []
+  for sentence in testingExamples:
+            Ipredictedlabels.append(improved.classify(sentence[1]))
+            Igoldlabels.append(sentence[2])
+            print(improved.score(sentence[1]))
+  
+  improved_precision = precision(Igoldlabels, Ipredictedlabels)
+  improved_recall = recall(Igoldlabels, Ipredictedlabels)
+  improved_f1 = f1(Igoldlabels, Ipredictedlabels)
+  
+  # report precision, recall, f1
+  print("Improved Precision: " + str(improved_precision))
+  print("Improved Recall: " + str(improved_recall))
+  print("Improved F1: " + str(improved_f1))
 
   # report final precision, recall, f1 (for your best model)
+  print("Best precision: " + str(max(naive_precision, improved_precision)))
+  print("Best recall: " + str(max(naive_recall, improved_recall)))
+  print("Best f1: " + str(max(naive_f1, improved_f1)))
 
 
 

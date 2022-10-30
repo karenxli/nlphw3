@@ -164,9 +164,6 @@ class TestTextClassifyBaselineMiniTrain(unittest.TestCase):
         examples = tc_model.generate_tuples_from_file(self.filePath)
         im.train(examples)
         devExamples = tc_model.generate_tuples_from_file(self.devPath)
-        #label=im.classify("I hated the hotel")
-        #actualLabel='0'
-        #self.assertEqual(actualLabel,label) 
 
         goldlabels = []
         predictedlabels = []
